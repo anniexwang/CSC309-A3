@@ -5,6 +5,7 @@ import Avatar from "@mui/material/Avatar";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import Chip from "@mui/material/Chip";
+import { StatusChip } from "../../components/ui/StatusChip";
 import Alert from "@mui/material/Alert";
 import Snackbar from "@mui/material/Snackbar";
 import Divider from "@mui/material/Divider";
@@ -184,14 +185,17 @@ export function AdminQualificationReviewPage() {
             </Box>
           </Box>
           <Box sx={{ display: "flex", flexDirection: "column", gap: 1, alignItems: { xs: "flex-start", sm: "flex-end" } }}>
-            <Chip
+            {/* <Chip
               label={qualification?.status || "unknown"}
               color={getStatusChipColor(qualification?.status)}
               sx={{ textTransform: "capitalize" }}
+            /> */}
+            <StatusChip 
+              status={qualification?.status || "unknown"}
             />
             <Chip
               label={getReviewPriorityLabel(qualification?.status)}
-              color={reviewable ? "warning" : "default"}
+              color={reviewable ? "error" : "default"}
               variant="outlined"
               size="small"
             />
