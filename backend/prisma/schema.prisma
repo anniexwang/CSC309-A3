@@ -1,0 +1,134 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id Int @id @default(autoincrement())
+  email String @unique
+  password String
+  role String
+  isAdmin Boolean @default(false)
+  activated Boolean @default(false)
+  utorid String?
+  token String? @unique
+  tokenExpiresAt DateTime?
+  resetToken String? @unique
+  expiresAt DateTime?
+  lastActiveAt DateTime @default(now())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  regularProfile RegularProfile? 
+  businessProfile BusinessProfile?
+  userQualifications UserQualification[]
+  jobInterests JobInterest[]
+  jobsFilled JobPosting[]
+}
+
+model RegularProfile {
+  regular_id Int @id @default(autoincrement())
+  user_id Int @unique
+  user User @relation(fields: [user_id], references: [id])
+  first_name String
+  last_name String
+  suspended Boolean @default(false)
+  available Boolean @default(true)
+  phone_number String @default("")
+  postal_address String @default("")
+  birthday String @default("")
+  avatar String?
+  resume String?
+  biography String?
+}
+
+model BusinessProfile {
+  business_id Int @id @default(autoincrement())
+  user_id Int @unique
+  user User @relation(fields: [user_id], references: [id])
+  business_name String
+  owner_name String
+  verified Boolean @default(false)
+  phone_number String
+  postal_address String
+  location Json
+  avatar String?
+  biography String @default("")
+  jobPostings JobPosting[]
+  jobInterests JobInterest[]
+}
+
+model PositionType {
+  position_type_id Int @id @default(autoincrement())
+  name String
+  description String
+  hidden Boolean @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  userQualifications UserQualification[]
+  jobPostings JobPosting[]
+}
+
+model UserQualification {
+  user_qualification_id Int @id @default(autoincrement())
+  user_id Int
+  user User @relation(fields: [user_id], references: [id])
+  position_type_id Int
+  position_type PositionType @relation(fields: [position_type_id], references: [position_type_id])
+  status String @default("created")
+  note String @default("")
+  document String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+}
+
+model JobInterest {
+  interest_id Int @id @default(autoincrement())
+  job_id Int
+  jobPosting JobPosting @relation(fields: [job_id], references: [job_id])
+  candidate_id Int
+  candidate User @relation(fields: [candidate_id], references: [id])
+  candidateInterested Boolean?
+  business_id Int
+  business BusinessProfile @relation(fields: [business_id], references: [business_id])
+  businessInvitation Boolean?
+  invitationStatus String @default("open")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  negotiation Negotiation?
+}
+
+model Negotiation {
+  id Int @id @default(autoincrement())
+  interest_id Int @unique
+  interest JobInterest @relation(fields: [interest_id], references: [interest_id], onDelete: Cascade)
+  status String @default("active")
+  candidateDecision String?
+  businessDecision String?
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+}
+
+model JobPosting {
+  job_id Int @id @default(autoincrement())
+  business_id Int
+  business BusinessProfile @relation(fields: [business_id], references: [business_id])
+  position_type_id Int
+  position_type PositionType @relation(fields: [position_type_id], references: [position_type_id])
+  salary_min Int
+  salary_max Int
+  start_time DateTime
+  end_time DateTime
+  worker_id Int?
+  worker User? @relation(fields: [worker_id], references: [id])
+  note String?
+  status String
+  filledAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  jobInterests JobInterest[]
+}
