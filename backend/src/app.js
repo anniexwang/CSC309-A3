@@ -4,6 +4,8 @@ const express = require("express");
 const cors = require("cors");
 const multer = require("multer");
 
+const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";
+
 const businessRouter = require("./routes/businesses");
 const jobRouter = require("./routes/jobs");
 const positionTypesRouter = require("./routes/position-types");
@@ -17,11 +19,14 @@ function create_app() {
     const app = express();
     app.use(express.json());
     app.use(cors({
-        origin: ["http://localhost:5173", "http://localhost:5174"],
+        origin: [FRONTEND_URL, "http://localhost:5174"],
         methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
         allowedHeaders: ["Content-Type", "Authorization"],
         credentials: true
     }));
+
+    app.options("*", cors());
+    
     global.systemConfig = { 
         negotiationWindow: 172800, // seconds (2 days)
         resetCooldown: 60, // seconds
